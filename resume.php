@@ -33,36 +33,34 @@
 	$alert_email = 'your@email.com';	// your e-mail address	
 	
 	// don't edit past here unless you know what you're doing
-	include($path_whois);
+	require_once($path_whois);
 
-	$ip = $_SERVER['REMOTE_ADDR'];
-	$host = gethostbyaddr($ip);
-	$referer = $_SERVER['HTTP_REFERER'];
-	$user = $_SERVER['HTTP_USER_AGENT'];
-
-	$whois = new Whois();
-	$whois_ip = $whois->Lookup($ip);
+	$host = gethostbyaddr($_SERVER['REMOTE_ADDR']);
 
 	if(	strpos($host, 'crawl') !== false || 
 		strpos($host, 'spider') !== false || 
 		strpos($host, 'bot') !== false || 
-		strpos($user, 'crawl') !== false || 
-		strpos($user, 'spider') !== false || 
-		strpos($user, 'bot') !== false
+		strpos($_SERVER['HTTP_USER_AGENT'], 'crawl') !== false || 
+		strpos($_SERVER['HTTP_USER_AGENT'], 'spider') !== false || 
+		strpos($_SERVER['HTTP_USER_AGENT'], 'bot') !== false
 	) {
 	   	$dontsend = true;
 	}
 
-	if(!isset($dontsend)) {
-		$body = "IP: $ip\nHostname: $host\nReferer: $referer\nUser Agent: $user\n\nIP Registered To: {$whois_ip['regrinfo']['owner']['organization']}\nAddress: {$whois_ip['regrinfo']['owner']['address']['street']}, {$whois_ip['regrinfo']['owner']['address']['city']}, {$whois_ip['regrinfo']['owner']['address']['state']}, {$whois_ip['regrinfo']['owner']['address']['pcode']}, {$whois_ip['regrinfo']['owner']['address']['country']}";
-
-		$header = "From: ".$alert_email."\r\n";
-
-		@mail($alert_email, 'Your resume was read!', $body, $header);
-	}
-
 	if($ext_resume == 'pdf') header("Content-Type: application/pdf");
 	else header("Content-Type: text/html");
+
 	header("Content-Length: ".filesize($path_resume));
 	header("Content-Disposition: inline; filename=".$file_resume.".".$ext_resume);
 	readfile($path_resume);
+
+	flush();
+
+	$whois = new Whois();
+	$whois_ip = $whois->Lookup($_SERVER['REMOTE_ADDR']);
+
+	if(!isset($dontsend)) {
+		$body = "IP: {$_SERVER['REMOTE_ADDR']}\nHostname: $host\nReferer: {$_SERVER['HTTP_REFERER']}\nUser Agent: {$_SERVER['HTTP_USER_AGENT']}\n\nIP Registered To: {$whois_ip['regrinfo']['owner']['organization']}\nAddress: {$whois_ip['regrinfo']['owner']['address']['street']}, {$whois_ip['regrinfo']['owner']['address']['city']}, {$whois_ip['regrinfo']['owner']['address']['state']}, {$whois_ip['regrinfo']['owner']['address']['pcode']}, {$whois_ip['regrinfo']['owner']['address']['country']}";
+		$header = "From: ".$alert_email."\r\n";
+		@mail($alert_email, 'Your resume was read!', $body, $header);
+	}
