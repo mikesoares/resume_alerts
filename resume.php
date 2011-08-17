@@ -66,4 +66,3 @@
 	header("Content-Length: ".filesize($path_resume));
 	header("Content-Disposition: inline; filename=".$file_resume.".".$ext_resume);
 	readfile($path_resume);
-?>
