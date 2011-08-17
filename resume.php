@@ -50,21 +50,20 @@
 		strpos($user, 'spider') !== false || 
 		strpos($user, 'bot') !== false
 	) {
-        $dontsend = true;
+	   	$dontsend = true;
 	}
 
-    if(!isset($dontsend)) {
-        $body = "IP: $ip\nHostname: $host\nReferer: $referer\nUser Agent: $user\n\nIP Registered To: {$whois_ip['regrinfo']['owner']['organization']}\nAddress: {$whois_ip['regrinfo']['owner']['address']['street']}, {$whois_ip['regrinfo']['owner']['address']['city']}, {$whois_ip['regrinfo']['owner']['address']['state']}, {$whois_ip['regrinfo']['owner']['address']['pcode']}, {$whois_ip['regrinfo']['owner']['address']['country']}";
+	if(!isset($dontsend)) {
+		$body = "IP: $ip\nHostname: $host\nReferer: $referer\nUser Agent: $user\n\nIP Registered To: {$whois_ip['regrinfo']['owner']['organization']}\nAddress: {$whois_ip['regrinfo']['owner']['address']['street']}, {$whois_ip['regrinfo']['owner']['address']['city']}, {$whois_ip['regrinfo']['owner']['address']['state']}, {$whois_ip['regrinfo']['owner']['address']['pcode']}, {$whois_ip['regrinfo']['owner']['address']['country']}";
 
-        $header = "From: ".$alert_email."\r\n";
+		$header = "From: ".$alert_email."\r\n";
 
-        @mail($alert_email, 'Your resume was read!', $body, $header);
-    }
-	
+		@mail($alert_email, 'Your resume was read!', $body, $header);
+	}
+
 	if($ext_resume == 'pdf') header("Content-Type: application/pdf");
 	else header("Content-Type: text/html");
 	header("Content-Length: ".filesize($path_resume));
 	header("Content-Disposition: inline; filename=".$file_resume.".".$ext_resume);
 	readfile($path_resume);
-
 ?>
